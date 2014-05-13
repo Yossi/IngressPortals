@@ -3,7 +3,7 @@ import sys
 import secret
 
 import MySQLdb
-db = MySQLdb.connect(*secret.db_credentials)
+db = MySQLdb.connect(**secret.db_credentials)
 
 def exec_mysql(sql):
     cur = db.cursor()
