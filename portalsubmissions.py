@@ -21,7 +21,8 @@ def get_timespan(ping, pong=None):
 
 def get_chart_data(cmd='start'):
     data = list(exec_mysql('SELECT ping, pong, `name`, `status` FROM portals;'))
-    first_run = exec_mysql('SELECT min(ping) FROM portals;')[0])
+    first_run = exec_mysql('SELECT min(ping) FROM portals;')[0]
+    print first_run
 
     dataTable = []
 
