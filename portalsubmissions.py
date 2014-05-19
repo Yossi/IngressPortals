@@ -21,6 +21,7 @@ def get_timespan(ping, pong=None):
 
 def get_chart_data(cmd='start'):
     data = list(exec_mysql('SELECT ping, pong, `name`, `status` FROM portals;'))
+    first_run = exec_mysql('SELECT min(ping) FROM portals;')[0])
 
     dataTable = []
 
@@ -52,7 +53,7 @@ def get_chart_data(cmd='start'):
         ping, pong, name, status = row
         fillings = {'id': status_name[status],
                     'name': name.replace("'", "\\'"),
-                    'ping': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if ping else '',
+                    'ping': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if ping else first_run.strftime('%Y, %m-1, %d, %H, %M, %S'),
                     'pong': pong.strftime('%Y, %m-1, %d, %H, %M, %S') if pong else now.strftime('%Y, %m-1, %d, %H, %M, %S')
                    }
         dataTable.append( fillings )
