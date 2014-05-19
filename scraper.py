@@ -1,7 +1,7 @@
 import gmail # https://github.com/charlierguo/gmail
 import sys
 import secret
-from datetime import date as date_
+import datetime
 
 import MySQLdb
 db = MySQLdb.connect(**secret.db_credentials)
@@ -25,7 +25,7 @@ def scrape():
              'Ingress Portal Game Rejected',)
 
     last_run = max(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
-    if not last_run: last_run = date_(2012, 11, 15) # closed beta begin date
+    if not last_run: last_run = datetime.datetime(2012, 11, 15) # closed beta begin date
     data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;')
 
     print 'logging into %s@gmail.com' % username
