@@ -59,10 +59,10 @@ def scrape():
  
             if preamble in pongs and date not in zip(*data)[1]:
                 status = 'Live' in preamble
-                dangling_data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals WHERE pong is null;')
-                names = zip(*dangling_data)[2]
+                #dangling_data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals WHERE pong is null;')
+                names = zip(*data)[2]
                 if names.count(portal_name) == 1:
-                    print 'portal response recieved'
+                    print 'portal response received'
                     exec_mysql("UPDATE portals SET pong = '%s', `status` = %s WHERE `name` = '%s';" % (date, status, portal_name))
                 else:
                     print 'duplicate or modified name; attention required'
