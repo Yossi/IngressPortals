@@ -23,8 +23,8 @@ def scrape():
              'Ingress Portal Duplicate',
              'Ingress Portal Game Rejected',)
 
-    last_run = max(exec_mysql('SELECT max(ping), max(pong) FROM portals;')[0])
-    data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals;')
+    last_run = max(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
+    data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;')
 
     print 'logging into %s@gmail.com' % username
     g = gmail.login(username, password)
@@ -54,19 +54,19 @@ def scrape():
             if preamble in pings and date not in zip(*data)[0]:
                 print 'new submitted portal'
                 url = message.html.partition('src="')[2].partition('" alt="')[0]
-                exec_mysql("INSERT INTO portals (ping, `name`, image_url) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE image_url='%s';" % (date, portal_name, url, url))
-                data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals;') # refresh data in case we get a response on this run too
+                exec_mysql("INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE image_url='%s';" % (date, portal_name, url, url))
+                data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;') # refresh data in case we get a response on this run too
  
             if preamble in pongs and date not in zip(*data)[1]:
                 status = 'Live' in preamble
-                dangling_data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals WHERE status is null;')
+                dangling_data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2 WHERE status is null;')
                 names = zip(*dangling_data)[2]
                 if names.count(portal_name) == 1:
                     print 'portal response received'
-                    exec_mysql("UPDATE portals SET pong = '%s', `status` = %s WHERE `name` = '%s AND status is null LIMIT 1';" % (date, status, portal_name))
+                    exec_mysql("UPDATE portals2 SET pong = '%s', `status` = %s WHERE `name` = '%s AND status is null LIMIT 1';" % (date, status, portal_name))
                 else:
                     print 'duplicate or modified name; attention required'
-                    exec_mysql("INSERT INTO portals (pong, `name`, `status`) VALUES ('%s', '%s', %s) ON DUPLICATE KEY UPDATE Id=Id;" % (date, portal_name, status))
+                    exec_mysql("INSERT INTO portals2 (pong, `name`, `status`) VALUES ('%s', '%s', %s) ON DUPLICATE KEY UPDATE Id=Id;" % (date, portal_name, status))
 
     print 'done'
     g.logout()
