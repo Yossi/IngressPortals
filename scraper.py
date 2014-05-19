@@ -24,7 +24,7 @@ def scrape():
              'Ingress Portal Duplicate',
              'Ingress Portal Game Rejected',)
 
-    last_run = max(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
+    last_run = max([d for d in exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0] if d])
     if not last_run: last_run = datetime.datetime(2012, 11, 15) # closed beta begin date
     data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;')
 
