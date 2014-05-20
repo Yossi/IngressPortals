@@ -8,7 +8,7 @@ import datetime
 from werkzeug.wrappers import Request, Response
 from jinja2 import Environment, FileSystemLoader
 from collections import Counter
-from scraper import exec_mysql
+from util import exec_mysql
 
 def get_timespan(ping, pong=None):
     ping_date = ping
