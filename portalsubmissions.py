@@ -20,8 +20,8 @@ def get_timespan(ping, pong=None):
     return (pong_date - ping_date).days
 
 def get_chart_data(cmd='start'):
-    data = list(exec_mysql('SELECT ping, pong, `name`, `status` FROM portals;'))
-    first_run = exec_mysql('SELECT min(ping) FROM portals;')[0][0]
+    data = list(exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;'))
+    first_run = exec_mysql('SELECT min(ping) FROM portals2;')[0][0]
 
     dataTable = []
 
@@ -68,7 +68,7 @@ def render_template(jinja_env, template_name, **context):
 
 def get_json():
     output = []
-    for ping, pong, name, status in exec_mysql('SELECT ping, pong, `name`, `status` FROM portals;'):
+    for ping, pong, name, status in exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;'):
         output.append({'ping': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if ping else None,
                        'pong': pong.strftime('%Y, %m-1, %d, %H, %M, %S') if pong else None,
                        'name': name,
