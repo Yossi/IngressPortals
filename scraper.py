@@ -4,6 +4,15 @@ import secret
 import datetime
 from util import exec_mysql
 
+def get_start_date():
+    dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
+    dates.append(datetime.datetime(2012, 11, 15)) # closed beta begin date
+    dates = filter(lambda x: bool(x), dates)
+    if len(dates) > 1:
+        return max(dates)
+    else:
+        return dates[0]
+
 def scrape():
     username = secret.your_email
     password = secret.email_password
@@ -14,8 +23,8 @@ def scrape():
              'Ingress Portal Duplicate',
              'Ingress Portal Game Rejected',)
 
-    last_run = max([d for d in exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0] if d])
-    if not last_run: last_run = datetime.datetime(2012, 11, 15) # closed beta begin date
+    start_date = get_start_date()
+
     data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;')
 
     print 'logging into %s@gmail.com' % username
@@ -25,8 +34,8 @@ def scrape():
         sys.exit(1)
     print "we're in"
     emails = []
-    emails.extend(g.inbox().mail(sender='super-ops@google.com', after=last_run.date()))
-    emails.extend(g.inbox().mail(sender='ingress-support@google.com', after=last_run.date()))
+    emails.extend(g.inbox().mail(sender='super-ops@google.com', after=start_date.date()))
+    emails.extend(g.inbox().mail(sender='ingress-support@google.com', after=start_date.date()))
 
     if len(emails): print 'emails found. proccessing...'
     else: print 'no new emails found'
