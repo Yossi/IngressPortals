@@ -20,7 +20,7 @@ def get_timespan(ping, pong=None):
     return (pong_date - ping_date).days
 
 def get_chart_data(cmd='start'):
-    data = list(exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;'))
+    data = list(exec_mysql('SELECT ping, pong, `name`, `status`, Id FROM portals2;'))
     first_run = exec_mysql('SELECT min(ping) FROM portals2;')[0][0]
 
     dataTable = []
@@ -34,7 +34,8 @@ def get_chart_data(cmd='start'):
                     None: '#FF9900'}
 
     if cmd == 'start' or cmd == None:
-        data.sort(key=lambda x: x[0] if x[0] else first_run)
+        pass
+        #data.sort(key=lambda x: x[0] if x[0] else first_run)
     if cmd == 'end':
         data.sort(key=lambda x: x[1] if x[1] else datetime.datetime.utcnow())
     if cmd == 'days':
@@ -50,7 +51,7 @@ def get_chart_data(cmd='start'):
 
     now = datetime.datetime.utcnow()
     for id_, row in enumerate(data):
-        ping, pong, name, status = row
+        ping, pong, name, status, _ = row
         fillings = {'id': status_name[status],
                     'name': name.replace("'", "\\'"),
                     'ping': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if ping else first_run.strftime('%Y, %m-1, %d, %H, %M, %S'),
