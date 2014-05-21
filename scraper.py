@@ -25,8 +25,6 @@ def scrape():
 
     start_date = get_start_date()
 
-    data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;')
-
     print 'logging into %s@gmail.com' % username
     g = gmail.login(username, password)
     if not g.logged_in:
@@ -39,7 +37,7 @@ def scrape():
 
     if len(emails): print 'emails found. proccessing...'
     else: print 'no new emails found'
-    length_before = len(data)
+    length_before = exec_mysql('select count(*) from portals2')[0][0]
     print length_before 
 
     for message in emails:
@@ -52,13 +50,12 @@ def scrape():
             portal_name = portal_name.lower().strip().replace("'", "\\'")
             date = str(message.sent_at)
 
-            if preamble in pings and date not in zip(*data)[0]:
+            if preamble in pings and date not in set(chain(*exec_mysql('select ping from portals2'))):
                 print 'new submitted portal'
                 url = message.html.partition('src="')[2].partition('" alt="')[0]
                 exec_mysql("INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE image_url='%s';" % (date, portal_name, url, url))
-                data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;') # refresh data in case we get a response on this run too
  
-            if preamble in pongs and date not in zip(*data)[1]:
+            if preamble in pongs and date not in set(chain(*exec_mysql('select pong from portals2'))):
                 status = 'Live' in preamble
                 dangling_data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2 WHERE status is null;')
                 names = zip(*dangling_data)[2]
@@ -73,7 +70,7 @@ def scrape():
     g.logout()
     print 'logged out'
 
-    length_after = len(data)
+    length_after = exec_mysql('select count(*) from portals2')[0][0]
     if length_after == length_before:
         print 'no change'
     print 'all done'
