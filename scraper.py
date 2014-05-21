@@ -3,6 +3,7 @@ import sys
 import secret
 import datetime
 from util import exec_mysql
+from itertools import chain
 
 def get_start_date():
     dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
