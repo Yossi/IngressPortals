@@ -38,7 +38,7 @@ def scrape():
 
     if len(emails): print 'emails found. proccessing...'
     else: print 'no new emails found'
-    length_before = exec_mysql('select count(*) from portals2')[0][0]
+    length_before = exec_mysql('SELECT count(*) FROM portals2')[0][0]
     print length_before 
 
     for message in emails:
@@ -51,12 +51,12 @@ def scrape():
             portal_name = portal_name.lower().strip().replace("'", "\\'")
             date = str(message.sent_at)
 
-            if preamble in pings and date not in set(chain(*exec_mysql('select ping from portals2'))):
+            if preamble in pings and date not in set(chain(*exec_mysql('SELECT ping FROM portals2'))):
                 print 'new submitted portal'
                 url = message.html.partition('src="')[2].partition('" alt="')[0]
                 exec_mysql("INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', '%s', '%s') ON DUPLICATE KEY UPDATE image_url='%s';" % (date, portal_name, url, url))
  
-            if preamble in pongs and date not in set(chain(*exec_mysql('select pong from portals2'))):
+            if preamble in pongs and date not in set(chain(*exec_mysql('SELECT pong FROM portals2'))):
                 status = 'Live' in preamble
                 dangling_data = exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2 WHERE status is null;')
                 names = zip(*dangling_data)[2]
@@ -71,7 +71,7 @@ def scrape():
     g.logout()
     print 'logged out'
 
-    length_after = exec_mysql('select count(*) from portals2')[0][0]
+    length_after = exec_mysql('SELECT count(*) FROM portals2')[0][0]
     if length_after == length_before:
         print 'no change'
     print 'all done'
