@@ -54,8 +54,8 @@ def get_chart_data(cmd='start'):
         ping, pong, name, status, _ = row
         fillings = {'id': status_name[status],
                     'name': name.replace("'", "\\'"),
-                    'ping': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if ping else first_run.strftime('%Y, %m-1, %d, %H, %M, %S'),
-                    'pong': pong.strftime('%Y, %m-1, %d, %H, %M, %S') if pong else now.strftime('%Y, %m-1, %d, %H, %M, %S')
+                    'ping': ping.isoformat() if ping else first_run.isoformat(),
+                    'pong': pong.isoformat() if pong else now.isoformat()
                    }
         dataTable.append( fillings )
 
@@ -71,7 +71,7 @@ def get_json():
     output = []
     for ping, pong, name, status in exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;'):
         output.append({'ping': ping.isoformat() if ping else None,
-                       'pong': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if pong else None,
+                       'pong': pong.isoformat() if pong else None,
                        'name': name,
                        'status': status})
     return json.dumps(output, indent=4, separators=(',', ': '))
