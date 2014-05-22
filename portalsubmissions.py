@@ -71,7 +71,7 @@ def get_json():
     output = []
     for ping, pong, name, status in exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;'):
         output.append({'ping': ping.isoformat() if ping else None,
-                       'pong': pong.strftime('%Y, %m-1, %d, %H, %M, %S') if pong else None,
+                       'pong': ping.strftime('%Y, %m-1, %d, %H, %M, %S') if pong else None,
                        'name': name,
                        'status': status})
     return json.dumps(output, indent=4, separators=(',', ': '))
