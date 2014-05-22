@@ -49,13 +49,13 @@ def scrape():
         if ':' in subject and 'Ingress Portal' in subject:
             preamble, portal_name = subject.partition(':')[::2]
             portal_name = portal_name.lower().strip()
-            date = str(message.sent_at)
+            date = message.sent_at
 
             if preamble in pings and date not in set(chain(*exec_mysql('SELECT ping FROM portals2'))):
                 print 'new submitted portal'
                 url = message.html.partition('src="')[2].partition('" alt="')[0]
                 exec_mysql("""INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', "%s", '%s') ON DUPLICATE KEY UPDATE image_url='%s';""" % (date, portal_name.replace('"', '\\"'), url, url))
- 
+
             if preamble in pongs and date not in set(chain(*exec_mysql('SELECT pong FROM portals2'))):
                 status = ('Live' in preamble)
                 names = list(chain(*exec_mysql('SELECT `name` FROM portals2 WHERE status is null;')))
@@ -72,7 +72,7 @@ def scrape():
 
     length_after = exec_mysql('SELECT count(*) FROM portals2')[0][0]
     if length_after == length_before:
-        print 'no new portals'
+        print 'no change'
     print 'all done'
 
 if __name__ == '__main__':
