@@ -72,7 +72,7 @@ def scrape():
 
     length_after = exec_mysql('SELECT count(*) FROM portals2')[0][0]
     if length_after == length_before:
-        print 'no change'
+        print 'no new portals'
     print 'all done'
 
 if __name__ == '__main__':
