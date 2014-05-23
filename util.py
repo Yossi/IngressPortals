@@ -27,7 +27,7 @@ def exec_mysql(sql, retries=2):
         db.commit()
         return rows
         
-    except OperationalError as exc:
+    except MySQLdb.OperationalError as exc:
         if cursor:
             cursor.close()
         cm.close()
