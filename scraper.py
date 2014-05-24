@@ -38,7 +38,8 @@ def scrape():
 
     if len(emails): print 'emails found. proccessing...'
     else: print 'no new emails found'
-    length_before = exec_mysql('SELECT count(*) FROM portals2')[0][0]
+    status_before = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
+    
     print length_before 
 
     for message in emails:
@@ -70,8 +71,8 @@ def scrape():
     g.logout()
     print 'logged out'
 
-    length_after = exec_mysql('SELECT count(*) FROM portals2')[0][0]
-    if length_after == length_before:
+    status_after = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
+    if status_after == status_before:
         print 'no change'
     print 'all done'
 
