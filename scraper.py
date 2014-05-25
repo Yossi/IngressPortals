@@ -4,6 +4,7 @@ import secret
 import datetime
 from util import exec_mysql
 from itertools import chain
+import operator
 
 def get_start_date():
     dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
@@ -13,6 +14,11 @@ def get_start_date():
         return max(dates)
     else:
         return dates[0]
+
+def get_status(status_before, status_after):
+    if status_after == status_before:
+        return 'no change'
+    return 'Accepted: %s Rejected: %s Pending: %s' % tuple(map(operator.__sub__, status_after, status_before))
 
 def scrape():
     username = secret.your_email
@@ -72,8 +78,7 @@ def scrape():
     print 'logged out'
 
     status_after = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
-    if status_after == status_before:
-        print 'no change'
+    print get_status(status_before, status_after)
     print 'all done'
 
 if __name__ == '__main__':
