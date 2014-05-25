@@ -82,10 +82,12 @@ def application(environ, start_response):
 
     request = Request(environ)
     cmd = request.args.get('cmd', None)
-    if cmd != 'raw':
-        response = render_template(jinja_env, 'table.html', **get_chart_data(cmd))
-    else:
+    if cmd == 'raw':
         response = Response(get_json())
+    elif cmd == 'histogram':
+        response = render_template(jinja_env, 'histogram.html', **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
+    else:
+        response = render_template(jinja_env, 'table.html', **get_chart_data(cmd))
 
     return response(environ, start_response)
 

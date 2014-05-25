@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+        ['Time', 'data'],
+        {% for row in data %}
+          ['{{row.0}}', {{row.1}}],
+        {% endfor %}
+        ]);
+
+        var options = {
+          title: 'Time of day, in UTC, of responses',
+          legend: { position: 'none' },
+          //histogram: { bucketSize: 180 },
+        };
+
+        var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+</html>
