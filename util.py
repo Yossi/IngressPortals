@@ -28,8 +28,8 @@ def exec_mysql(sql, retries=2):
         return rows
         
     except MySQLdb.OperationalError as exc:
-        if cursor:
-            cursor.close()
+        if cur:
+            cur.close()
         cm.close()
         if retries:
             return exec_mysql(sql, retries-1)

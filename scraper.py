@@ -46,7 +46,7 @@ def scrape():
     else: print 'no new emails found'
     status_before = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
     
-    print status_before 
+    #print status_before 
 
     for message in emails:
         message.fetch()
