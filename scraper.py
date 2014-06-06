@@ -45,8 +45,6 @@ def scrape():
     if len(emails): print 'emails found. proccessing...'
     else: print 'no new emails found'
     status_before = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
-    
-    #print status_before 
 
     for message in emails:
         message.fetch()
@@ -57,6 +55,10 @@ def scrape():
             preamble, portal_name = subject.partition(':')[::2]
             portal_name = portal_name.lower().strip()
             date = message.sent_at
+            status = ('Live' in preamble)
+
+            portal_url = message.html.partition('<a href="')[2].partition('">')[0].replace('&amp;', '&')
+            portal_url = portal_url if 'll' in portal_url else ''
 
             if preamble in pings and date not in set(chain(*exec_mysql('SELECT ping FROM portals2'))):
                 print 'new submitted portal'
@@ -64,14 +66,13 @@ def scrape():
                 exec_mysql("""INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', "%s", '%s') ON DUPLICATE KEY UPDATE image_url='%s';""" % (date, portal_name.replace('"', '\\"'), url, url))
 
             if preamble in pongs and date not in set(chain(*exec_mysql('SELECT pong FROM portals2'))):
-                status = ('Live' in preamble)
                 names = list(chain(*exec_mysql('SELECT `name` FROM portals2 WHERE status is null;')))
                 if names.count(portal_name) == 1:
                     print 'portal response received'
-                    exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s WHERE `name` = "%s" AND status is null LIMIT 1;""" % (date, status, portal_name.replace('"', '\\"')))
+                    exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = '%s' WHERE `name` = "%s" AND status is null LIMIT 1;""" % (date, status, portal_url, portal_name.replace('"', '\\"')))
                 else:
                     print 'duplicate or modified name; attention required'
-                    exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`) VALUES ('%s', "%s", %s) ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status))
+                    exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, "%s") ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url))
 
     print 'done'
     g.logout()
