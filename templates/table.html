@@ -32,11 +32,23 @@
         };
 
         function selectHandler() {
+        
+          function get_date_string(d) {
+            var m_names = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            return d.getDate() + "-" + m_names[d.getMonth()] + "-" + d.getFullYear();
+          }
+          
           var selectedItem = chart.getSelection()[0];
           if (selectedItem) {
+            var name = dataTable.getValue(selectedItem.Fb, 1);
             var start = dataTable.getValue(selectedItem.Fb, 2);
             var end = dataTable.getValue(selectedItem.Fb, 3);
-            console.log(start, end, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
+            var days = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+            
+            var info = name + ", Start:" + get_date_string(start) + ", End:" + get_date_string(end) + ", Days:" + days;
+            
+            console.log(start, end, days, name);
+            document.getElementById("info").innerHTML = info;
           }
         }
         
@@ -54,10 +66,16 @@
         <td style="background-color:rgb(220, 57, 18);color:rgb(255, 255, 255);font-family: Arial;">Rejected: {{count[False]}}</td>
         <td style="background-color:rgb(255, 153, 0);font-family: Arial;">Pending: {{count[None]}}</td>
         <td>&nbsp;</td>
-        <td><button onclick="location.href='/portalstatus?cmd=start'">Sort by submit date</button></td>
-        <td><button onclick="location.href='/portalstatus?cmd=end'">Sort by response date</button></td>
-        <td><button onclick="location.href='/portalstatus?cmd=days'">Sort by days waited</button></td>
-        <td><a href='/portalstatus?cmd=raw'>Raw json</a></td>
+        <td>
+          <select id="list" onChange="location.href=list.value">
+            <option value="/portalstatus">(None)</option>
+            <option value="/portalstatus?cmd=start">Sort by submit date</option>
+            <option value="/portalstatus?cmd=end">Sort by response date</option>
+            <option value="/portalstatus?cmd=days">Sort by days waited</option>
+            <option value="/portalstatus?cmd=raw">Raw JSON</option>
+          </select>
+        </td>
+        <td><div id="info"> </div></td>
       </tr>
     </table>
     <div id="example1" style="position:absolute;top:40;bottom:0;left:0;right:0;"></div>
