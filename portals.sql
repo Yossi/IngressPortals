@@ -5,7 +5,7 @@ CREATE TABLE `portals2` (
   `name` varchar(50) NOT NULL,
   `status` tinyint(1) DEFAULT NULL,
   `image_url` varchar(160) DEFAULT NULL,
-  `portal_url` varchar(80) DEFAULT NULL,
+  `portal_url` varchar(90) DEFAULT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `ping_UNIQUE` (`ping`),
   UNIQUE KEY `pong_UNIQUE` (`pong`)
