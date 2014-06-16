@@ -45,7 +45,7 @@
             var end = dataTable.getValue(selectedItem.Fb, 3);
             var days = Math.floor((end - start) / (1000 * 60 * 60 * 24));
             
-            var info = name + ", Start:" + get_date_string(start) + ", End:" + get_date_string(end) + ", Days:" + days;
+            var info = "Start:" + get_date_string(start) + ", End:" + get_date_string(end) + ", Days:" + days + ", Name:" + name;
             
             console.log(start, end, days, name);
             document.getElementById("info").innerHTML = info;
