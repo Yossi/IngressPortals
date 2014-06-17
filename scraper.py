@@ -5,6 +5,8 @@ import datetime
 from util import exec_mysql
 from itertools import chain
 import operator
+from urlparse import urlsplit, urlunsplit, parse_qs
+from urllib import urlencode
 
 def get_start_date():
     dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
@@ -19,6 +21,17 @@ def get_status(status_before, status_after):
     if status_after == status_before:
         return 'no change'
     return 'Accepted: %s Rejected: %s Pending: %s' % tuple(map(operator.__sub__, status_after, status_before))
+
+def canonicalize_url(url):
+    parts = urlsplit(url)
+    query = parse_qs(parts.query)
+    query['ll'] = '%s,%s' % tuple(map(float, query['ll'][0].split(',')))
+    newparts = ('https',
+                parts.netloc,
+                parts.path,
+                'll=%(ll)s&z=17&pll=%(ll)s' % query,
+                parts.fragment)
+    return urlunsplit(newparts)
 
 def scrape():
     username = secret.your_email
@@ -58,7 +71,7 @@ def scrape():
             status = ('Live' in preamble)
 
             portal_url = message.html.partition('<a href="')[2].partition('">')[0].replace('&amp;', '&')
-            portal_url = portal_url if 'll' in portal_url else ''
+            portal_url = canonicalize_url(portal_url) if 'll' in portal_url else ''
 
             if preamble in pings and date not in set(chain(*exec_mysql('SELECT ping FROM portals2'))):
                 print 'new submitted portal'
