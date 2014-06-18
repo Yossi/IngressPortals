@@ -19,6 +19,18 @@ def get_timespan(ping, pong=None):
 
     return (pong_date - ping_date).days
 
+def get_portal_info(date):
+    try:
+        date = dateutil.parser.parse(date) # attempt to make sure it's date-like (rather than SQLi-like)
+        data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
+                             FROM portals2 
+                             WHERE ping = '%s';''' % date)[0]
+        data = dict(zip(['ping', 'pong', 'name', 'status', 'image_url', 'portal_url'], data))
+        data['days'] = get_timespan(data['ping'], data['pong'])
+        return data
+    except (IndexError, ValueError):
+        return {}
+
 def get_chart_data(cmd='start'):
     data = list(exec_mysql('SELECT ping, pong, `name`, `status`, Id FROM portals2;'))
     first_run = exec_mysql('SELECT min(ping) FROM portals2;')[0][0]
