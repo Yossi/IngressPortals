@@ -51,7 +51,7 @@ def get_chart_data(cmd='start'):
     if cmd == 'end':
         data.sort(key=lambda x: x[1] if x[1] else datetime.datetime.utcnow())
     if cmd == 'days':
-        data.sort(key=lambda x: get_timespan(x[0], x[1]))
+        data.sort(key=lambda x: (get_timespan(x[0], x[1]), x[0]))
         data.reverse()
 
     colors = []
