@@ -93,8 +93,15 @@ def get_summary_data():
                          FROM portals2
                          ORDER BY ping''')
     cols = ['ping', 'pong', 'name', 'status', 'image_url', 'portal_url']
-    
-    return {'data': [dict(zip(cols, r)) for r in data]}
+    output = []
+    for row in data:
+        r = dict(zip(cols, row))
+        r['days'] = get_timespan(r['ping'], r['pong'])
+        r['ping'] = r['ping'].isoformat() if r['ping'] else None
+        r['pong'] = r['pong'].isoformat() if r['pong'] else None
+        output.append(r)
+        
+    return {'data': output}
 
 def application(environ, start_response):
     template_path = os.path.join(os.path.dirname(__file__), 'templates')
