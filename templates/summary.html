@@ -1,15 +1,36 @@
+{% macro get_color(status) -%}
+    {% if status == 1 %}
+rgb(51, 102, 204)
+    {% elif status == 0 %}
+rgb(220, 57, 18)
+    {% else %}
+rgb(255, 153, 0)
+    {% endif %}
+{%- endmacro %}
+
 <html>
 <head>
 <title>Ingress Portal Summary</title>
 </head>
 <body>
-<table border=1>
+I don't currently think all these should be portals, I was getting the feel for what should or should not be one.<br />
+Furthermore, I do confess to a couple joke submissions. None have gone live, thankfully. <i>-fatnino</i>
+<table>
 {% for row in data %}
-<tr>
-<td>
-{{row}}
-</td>
-</tr>
+    <tr>
+        <td style="background-color:{{ get_color(row.status) }};">
+          {% if row.portal_url %}
+            <a href='{{row.portal_url}}'>{{row.name}}</a><br />
+          {% else %}
+            {{row.name}}<br />
+          {% endif %}
+            {{row.ping}} to {{row.pong}}<br />
+            {{row.days}} day wait<br />
+        </td>
+        <td>
+            <img src='{{row.image_url}}' style="width: 50%; height: 50%" />
+        </td>
+    </tr>
 {% endfor %}
 </table>
 </body>
