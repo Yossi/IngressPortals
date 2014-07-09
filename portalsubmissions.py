@@ -92,7 +92,9 @@ def get_summary_data():
     data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
                          FROM portals2
                          ORDER BY ping''')
-    return {'data': data}
+    cols = ['ping', 'pong', 'name', 'status', 'image_url', 'portal_url']
+    
+    return {'data': [dict(zip(cols, r)) for r in data]}
 
 def application(environ, start_response):
     template_path = os.path.join(os.path.dirname(__file__), 'templates')
