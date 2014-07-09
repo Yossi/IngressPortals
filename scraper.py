@@ -70,22 +70,28 @@ def scrape():
             date = message.sent_at
             status = ('Live' in preamble)
 
+            image_url = message.html.partition('src="')[2].partition('" alt="')[0]
+
             portal_url = message.html.partition('<a href="')[2].partition('">')[0].replace('&amp;', '&')
-            portal_url = canonicalize_url(portal_url) if 'll' in portal_url else ''
+            portal_url = canonicalize_url(portal_url) if 'll' in portal_url else 'null'
 
             if preamble in pings and date not in set(chain(*exec_mysql('SELECT ping FROM portals2'))):
                 print 'new submitted portal'
-                url = message.html.partition('src="')[2].partition('" alt="')[0]
-                exec_mysql("""INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', "%s", '%s') ON DUPLICATE KEY UPDATE image_url='%s';""" % (date, portal_name.replace('"', '\\"'), url, url))
+                exec_mysql("""INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', "%s", '%s') ON DUPLICATE KEY UPDATE image_url='%s';""" % (date, portal_name.replace('"', '\\"'), image_url, image_url))
 
             if preamble in pongs and date not in set(chain(*exec_mysql('SELECT pong FROM portals2'))):
+                print 'portal response received'
                 names = list(chain(*exec_mysql('SELECT `name` FROM portals2 WHERE status is null;')))
                 if names.count(portal_name) == 1:
-                    print 'portal response received'
                     exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = '%s' WHERE `name` = "%s" AND status is null LIMIT 1;""" % (date, status, portal_url, portal_name.replace('"', '\\"')))
                 else:
-                    print 'duplicate or modified name; attention required'
-                    exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, "%s") ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url))
+                    #id = exec_sql("""SELECT Id FROM portals2 WHERE image_url = '%s';""" % image_url)[0]
+                    if image_url:
+                        print 'attempting image_url match'
+                        exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = '%s' WHERE image_url = '%s' AND status is null LIMIT 1;""" % (date, status, portal_url, image_url))
+                    else:
+                        print 'FAILED! duplicate or modified name; attention required'
+                        exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, "%s") ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url))
 
     print 'done'
     g.logout()
