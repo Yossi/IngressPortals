@@ -24,11 +24,12 @@ Furthermore, I do confess to a couple joke submissions. None have gone live, tha
           {% else %}
             {{row.name}}<br />
           {% endif %}
-            {{row.ping}} to {{row.pong}}<br />
+            From: {{row.ping}}<br />
+            To: {{row.pong}}<br />
             {{row.days}} day wait<br />
         </td>
         <td>
-            <img src='{{row.image_url}}' style="width: 50%; height: 50%" />
+            <a href='{{row.image_url}}'><img src='{{row.image_url}}' style="width: 50%;" /></a>
         </td>
     </tr>
 {% endfor %}
