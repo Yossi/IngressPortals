@@ -88,6 +88,12 @@ def get_json():
                        'status': status})
     return json.dumps(output, indent=4, separators=(',', ': '))
 
+def get_summary_data():
+    data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
+                         FROM portals2
+                         ORDER BY ping''')
+    return {'data': data}
+
 def application(environ, start_response):
     template_path = os.path.join(os.path.dirname(__file__), 'templates')
     jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
@@ -98,6 +104,8 @@ def application(environ, start_response):
         response = Response(get_json())
     elif cmd == 'histogram':
         response = render_template(jinja_env, 'histogram.html', **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
+    elif cmd == 'summary':
+        response = render_template(jinja_env, 'summary.html', **get_summary_data())
     else:
         response = render_template(jinja_env, 'table.html', **get_chart_data(cmd))
 
