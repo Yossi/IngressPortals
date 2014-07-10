@@ -89,10 +89,10 @@ def get_json():
     return json.dumps(output, indent=4, separators=(',', ': '))
 
 def get_summary_data():
-    data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
+    data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url, notes
                          FROM portals2
                          ORDER BY ping''')
-    cols = ['ping', 'pong', 'name', 'status', 'image_url', 'portal_url']
+    cols = ['ping', 'pong', 'name', 'status', 'image_url', 'portal_url', 'notes']
     output = []
     for row in data:
         r = dict(zip(cols, row))
