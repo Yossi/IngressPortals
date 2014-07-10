@@ -6,7 +6,8 @@ CREATE TABLE `portals2` (
   `status` tinyint(1) DEFAULT NULL,
   `image_url` varchar(160) DEFAULT NULL,
   `portal_url` varchar(90) DEFAULT NULL,
+  `notes` text,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `ping_UNIQUE` (`ping`),
   UNIQUE KEY `pong_UNIQUE` (`pong`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=286 DEFAULT CHARSET=utf8;
