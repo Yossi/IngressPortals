@@ -32,7 +32,7 @@ Furthermore, I do confess to a couple joke submissions. None have gone live, tha
           {% endif %}
         </td>
         <td>
-            <a href='{{row.image_url}}'><img src='{{row.image_url}}' style="width: 50%;" /></a>
+            <a href='{{row.image_url}}'><img src='{{row.image_url}}' onload="this.width>>=1;" /></a>
         </td>
     </tr>
 {% endfor %}
