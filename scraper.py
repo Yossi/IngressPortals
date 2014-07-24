@@ -31,7 +31,7 @@ def canonicalize_url(url):
                 parts.path,
                 'll=%(ll)s&z=17&pll=%(ll)s' % query,
                 parts.fragment)
-    return urlunsplit(newparts)
+    return '"' + urlunsplit(newparts) + '"'
 
 def scrape():
     username = secret.your_email
@@ -83,15 +83,15 @@ def scrape():
                 print 'portal response received'
                 names = list(chain(*exec_mysql('SELECT `name` FROM portals2 WHERE status is null;')))
                 if names.count(portal_name) == 1:
-                    exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = '%s' WHERE `name` = "%s" AND status is null LIMIT 1;""" % (date, status, portal_url, portal_name.replace('"', '\\"')))
+                    exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = %s WHERE `name` = "%s" AND status is null LIMIT 1;""" % (date, status, portal_url, portal_name.replace('"', '\\"')))
                 else:
                     #id = exec_sql("""SELECT Id FROM portals2 WHERE image_url = '%s';""" % image_url)[0]
                     if image_url:
                         print 'attempting image_url match'
-                        exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = '%s' WHERE image_url = '%s' AND status is null LIMIT 1;""" % (date, status, portal_url, image_url))
+                        exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = %s WHERE image_url = '%s' AND status is null LIMIT 1;""" % (date, status, portal_url, image_url))
                     else:
                         print 'FAILED! duplicate or modified name; attention required'
-                        exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, "%s") ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url))
+                        exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, %s) ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url))
 
     print 'done'
     g.logout()
