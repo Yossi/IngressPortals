@@ -62,8 +62,7 @@ def get_chart_data(cmd='start'):
         colors[i] = status_color[color]
 
     now = datetime.datetime.utcnow()
-    for id_, row in enumerate(data):
-        ping, pong, name, status, _ = row
+    for ping, pong, name, status, id_ in data:
         fillings = {'id': status_name[status],
                     'name': name.replace("'", "\\'"),
                     'ping': ping.isoformat() if ping else first_run.isoformat(),
