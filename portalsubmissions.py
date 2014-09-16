@@ -64,7 +64,7 @@ def get_chart_data(cmd='start'):
     now = datetime.datetime.utcnow()
     for ping, pong, name, status, id_ in data:
         fillings = {'id': status_name[status],
-                    'name': '{} ({})'.format(name.replace("'", "\\'"), get_timespan(ping, pong))
+                    'name': '{} ({})'.format(name.replace("'", "\\'"), get_timespan(ping, pong)),
                     'ping': ping.isoformat() if ping else first_run.isoformat(),
                     'pong': pong.isoformat() if pong else now.isoformat()
                    }
