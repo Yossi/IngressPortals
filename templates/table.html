@@ -32,17 +32,15 @@
         };
 
         function selectHandler() {
-        
           function get_date_string(d) {
             var m_names = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
             return d.getDate() + "-" + m_names[d.getMonth()] + "-" + d.getFullYear();
           }
-          
           var selectedItem = chart.getSelection()[0];
           if (selectedItem) {
-            var name = dataTable.getValue(selectedItem.bb, 1);
-            var start = dataTable.getValue(selectedItem.bb, 2);
-            var end = dataTable.getValue(selectedItem.bb, 3);
+            var name = dataTable.getValue(selectedItem.row, 1);
+            var start = dataTable.getValue(selectedItem.row, 2);
+            var end = dataTable.getValue(selectedItem.row, 3);
             var days = Math.floor((end - start) / (1000 * 60 * 60 * 24));
             
             var info = "Start:" + get_date_string(start) + ", End:" + get_date_string(end) + ", Days:" + days + ", Name:" + name.split('(').slice(0, -1).join('(');
