@@ -1,14 +1,12 @@
-import sys, os
-sys.path.append(os.path.dirname(__file__))
-
-from pprint import pprint, pformat
 import json
 import dateutil.parser
 import datetime
-from werkzeug.wrappers import Request, Response
-from jinja2 import Environment, FileSystemLoader
 from collections import Counter
 from util import exec_mysql
+
+from flask import Flask, render_template, url_for
+app = Flask(__name__)
+
 
 def get_timespan(ping, pong=None):
     ping_date = ping
@@ -18,18 +16,6 @@ def get_timespan(ping, pong=None):
         pong_date = datetime.datetime.utcnow()
 
     return (pong_date - ping_date).days
-
-def get_portal_info(date):
-    try:
-        date = dateutil.parser.parse(date) # attempt to make sure it's date-like (rather than SQLi-like)
-        data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
-                             FROM portals2 
-                             WHERE ping = '%s';''' % date)[0]
-        data = dict(zip(['ping', 'pong', 'name', 'status', 'image_url', 'portal_url'], data))
-        data['days'] = get_timespan(data['ping'], data['pong'])
-        return data
-    except (IndexError, ValueError):
-        return {}
 
 def get_chart_data(cmd='start'):
     data = list(exec_mysql('SELECT ping, pong, `name`, `status`, Id FROM portals2;'))
@@ -72,12 +58,28 @@ def get_chart_data(cmd='start'):
 
     return {'data': dataTable,
             'colors': colors,
-            'count': Counter(zip(*data)[3])}
+            'count': Counter(zip(*data)[3]),
+            'start_url': url_for('start'),
+            'end_url': url_for('end'),
+            'days_url': url_for('days'),
+            'json_url': url_for('get_json'),
+            'summary_url': url_for('get_summary_data'),
+            'histogram_url': url_for('get_histogram')}
 
-def render_template(jinja_env, template_name, **context):
-    t = jinja_env.get_template(template_name)
-    return Response(t.render(context), mimetype='text/html')
+@app.route('/')
+@app.route('/start')
+def start():
+    return render_template('table.html', **get_chart_data(cmd='start'))
 
+@app.route('/end')
+def end():
+    return render_template('table.html', **get_chart_data(cmd='end'))
+
+@app.route('/days')
+def days():
+    return render_template('table.html', **get_chart_data(cmd='days'))
+
+@app.route('/json')
 def get_json():
     output = []
     for ping, pong, name, status in exec_mysql('SELECT ping, pong, `name`, `status` FROM portals2;'):
@@ -87,6 +89,7 @@ def get_json():
                        'status': status})
     return json.dumps(output, indent=4, separators=(',', ': '))
 
+@app.route('/summary')
 def get_summary_data():
     data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url, notes
                          FROM portals2
@@ -100,36 +103,27 @@ def get_summary_data():
         r['pong'] = r['pong'].isoformat() if r['pong'] else None
         output.append(r)
         
-    return {'data': output}
+    return render_template('summary.html', **{'data': output})
 
-def application(environ, start_response):
-    template_path = os.path.join(os.path.dirname(__file__), 'templates')
-    jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
+@app.route('/summary/<date>')
+def get_portal_info(date):
+    try:
+        date = dateutil.parser.parse(date) # attempt to make sure it's date-like (rather than SQLi-like)
+        data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
+                             FROM portals2 
+                             WHERE ping = '%s';''' % date)[0]
+        data = dict(zip(['ping', 'pong', 'name', 'status', 'image_url', 'portal_url'], data))
+        data['days'] = get_timespan(data['ping'], data['pong'])
+    except (IndexError, ValueError):
+        data = {}
+    
+    return
+    #return render_template()  # TODO: create a template for this
 
-    request = Request(environ)
-    cmd = request.args.get('cmd', None)
-    if cmd == 'raw':
-        response = Response(get_json())
-    elif cmd == 'histogram':
-        response = render_template(jinja_env, 
-                                   'histogram.html', 
-                                   **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
-    elif cmd == 'summary':
-        response = render_template(jinja_env, 
-                                   'summary.html', 
-                                   **get_summary_data())
-    else:
-        response = render_template(jinja_env, 
-                                   'table.html', 
-                                   **get_chart_data(cmd))
-
-    return response(environ, start_response)
+@app.route('/histogram')
+def get_histogram():
+    return render_template('histogram.html', **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
 
 if __name__ == '__main__':
-    from wsgiref.simple_server import make_server
-    #from paste.evalexception.middleware import EvalException
-    #application = EvalException(application)
-    httpd = make_server('', 80, application)
-    print "server running"
-    httpd.handle_request()
-    print 'exiting'
+    app.run(host='0.0.0.0', debug=True)
+    
