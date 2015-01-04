@@ -108,7 +108,7 @@ def get_summary_data():
 @app.route('/summary/<date>')
 def get_portal_info(date):
     try:
-        date = dateutil.parser.parse(date) # attempt to make sure it's date-like (rather than SQLi-like)
+        date = dateutil.parser.parse(date, fuzzy=True) # attempt to make sure it's date-like (rather than SQLi-like)
         date = date + date.utcoffset()
         data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
                              FROM portals2 
