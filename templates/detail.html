@@ -1,5 +1,37 @@
+{% macro get_color(status) -%}
+    {% if status == 1 %}
+rgb(51, 102, 204)
+    {% elif status == 0 %}
+rgb(220, 57, 18)
+    {% else %}
+rgb(255, 153, 0)
+    {% endif %}
+{%- endmacro %}
+
 <html>
+<head>
+<title>{{data.name}}</title>
+</head>
 <body>
-{{data}}
+<table>
+  <tr>
+    <td style="background-color:{{ get_color(data.status) }};">
+      {% if data.portal_url %}
+        <a href='{{data.portal_url}}'>{{data.name}}</a><br />
+      {% else %}
+        {{data.name}}<br />
+      {% endif %}
+      From: {{data.ping}}<br />
+      To: {{data.pong}}<br />
+      {{data.days}} day wait<br />
+      {% if data.notes %}
+        <!--{{data.notes}}-->
+      {% endif %}
+    </td>
+    <td>
+      <a href='{{data.image_url}}'><img src='{{data.image_url}}' /></a>
+    </td>
+  </tr>
+</table>
 </body>
 </html>
