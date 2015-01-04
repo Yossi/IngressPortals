@@ -112,7 +112,7 @@ def get_portal_info(date):
         date = date + date.utcoffset()
         data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
                              FROM portals2 
-                             WHERE ping = '%s';''' % date)[0]
+                             WHERE ping = '%s';''' % date.strftime("%Y-%m-%d %H:%M:%S"))[0]
         data = dict(zip(['ping', 'pong', 'name', 'status', 'image_url', 'portal_url'], data))
         data['days'] = get_timespan(data['ping'], data['pong'])
     except (IndexError, ValueError):
