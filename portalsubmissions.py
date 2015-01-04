@@ -111,11 +111,17 @@ def application(environ, start_response):
     if cmd == 'raw':
         response = Response(get_json())
     elif cmd == 'histogram':
-        response = render_template(jinja_env, 'histogram.html', **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
+        response = render_template(jinja_env, 
+                                   'histogram.html', 
+                                   **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
     elif cmd == 'summary':
-        response = render_template(jinja_env, 'summary.html', **get_summary_data())
+        response = render_template(jinja_env, 
+                                   'summary.html', 
+                                   **get_summary_data())
     else:
-        response = render_template(jinja_env, 'table.html', **get_chart_data(cmd))
+        response = render_template(jinja_env, 
+                                   'table.html', 
+                                   **get_chart_data(cmd))
 
     return response(environ, start_response)
 
