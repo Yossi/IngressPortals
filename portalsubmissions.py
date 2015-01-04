@@ -109,6 +109,7 @@ def get_summary_data():
 def get_portal_info(date):
     try:
         date = dateutil.parser.parse(date) # attempt to make sure it's date-like (rather than SQLi-like)
+        date = date + date.utcoffset()
         data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
                              FROM portals2 
                              WHERE ping = '%s';''' % date)[0]
@@ -116,9 +117,8 @@ def get_portal_info(date):
         data['days'] = get_timespan(data['ping'], data['pong'])
     except (IndexError, ValueError):
         data = {}
-    
-    return
-    #return render_template()  # TODO: create a template for this
+
+    return render_template('detail.html', data=data)
 
 @app.route('/histogram')
 def get_histogram():
