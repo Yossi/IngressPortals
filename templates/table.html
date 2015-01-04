@@ -66,13 +66,13 @@
         <td>&nbsp;</td>
         <td>
           <select id="list" onChange="location.href=list.value">
-            <option value="/portalstatus">(None)</option>
-            <option value="/portalstatus?cmd=start">Sort by submit date</option>
-            <option value="/portalstatus?cmd=end">Sort by response date</option>
-            <option value="/portalstatus?cmd=days">Sort by days waited</option>
-            <option value="/portalstatus?cmd=raw">Raw JSON</option>
-            <option value="/portalstatus?cmd=histogram">Response Histogram</option>
-            <option value="/portalstatus?cmd=summary">Full Report with Images</option>
+            <option value="{{start_url}}">(None)</option>
+            <option value="{{start_url}}">Sort by submit date</option>
+            <option value="{{end_url}}">Sort by response date</option>
+            <option value="{{days_url}}">Sort by days waited</option>
+            <option value="{{json_url}}">Raw JSON</option>
+            <option value="{{histogram_url}}">Response Histogram</option>
+            <option value="{{summary_url}}">Full Report with Images</option>
           </select>
         </td>
         <td><div id="info" style="font-family: Arial;"> </div></td>
