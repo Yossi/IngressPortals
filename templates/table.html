@@ -20,7 +20,7 @@
 
         dataTable.addRows([
          {% for row in data %}
-          [ '{{row.id}}', '{{row.name|safe}}', new Date('{{row.ping|safe}}Z'), new Date('{{row.pong|safe}}Z') ],
+          [ '{{row.id}}', '{{row.name|safe}}', new Date('{{row.ping}}Z'), new Date('{{row.pong}}Z') ],
          {% endfor %}
         ]);
 
