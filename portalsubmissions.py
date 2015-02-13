@@ -1,5 +1,4 @@
 import json
-import dateutil.parser
 import datetime
 from collections import Counter
 from util import exec_mysql
@@ -108,8 +107,7 @@ def get_summary_data():
 @app.route('/summary/<date>')
 def get_portal_info(date):
     try:
-        date = dateutil.parser.parse(date.partition(' (')[0], fuzzy=True) # attempt to make sure it's date-like (rather than SQLi-like)
-        date = date + date.utcoffset()
+        date = datetime.datetime.fromtimestamp(int(date)/1000.0) # attempt to make sure it's date-like (rather than SQLi-like)
         data = exec_mysql('''SELECT ping, pong, `name`, `status`, image_url, portal_url
                              FROM portals2 
                              WHERE ping = '%s';''' % date.strftime("%Y-%m-%d %H:%M:%S"))[0]
