@@ -25,6 +25,7 @@ cm = CM(secret.db_credentials) # default so I don't have to fix my old code :P
 
 def exec_mysql(sql, retries=2):
     try:
+        cur = None # needed in case get_conn() dies
         db = cm.get_conn()
         cur = db.cursor()
         cur.execute(sql)
