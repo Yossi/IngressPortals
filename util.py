@@ -2,12 +2,18 @@ import secret
 import MySQLdb
 
 class CM(object):
-    def __init__(self):
+    ''' connection manager '''
+    def __init__(self, credentials):
         self.connection = None
-        
+        self.credentials = credentials
+
+    def set_credentials(self, credentials):
+        self.credentials = credentials
+        self.close()
+
     def get_conn(self):
         if not self.connection:
-            self.connection = MySQLdb.connect(**secret.db_credentials)
+            self.connection = MySQLdb.connect(self.credentials)
         return self.connection
 
     def close(self):
@@ -15,7 +21,7 @@ class CM(object):
             self.connection.close()
             self.connection = None
 
-cm = CM()
+cm = CM(**secret.db_credentials) # default so I don't have to fix my old code :P
 
 def exec_mysql(sql, retries=2):
     try:
@@ -26,7 +32,7 @@ def exec_mysql(sql, retries=2):
         cur.close()
         db.commit()
         return rows
-        
+
     except MySQLdb.OperationalError as exc:
         if cur:
             cur.close()
@@ -35,4 +41,3 @@ def exec_mysql(sql, retries=2):
             return exec_mysql(sql, retries-1)
         else:
             raise
-     
