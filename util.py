@@ -13,7 +13,7 @@ class CM(object):
 
     def get_conn(self):
         if not self.connection:
-            self.connection = MySQLdb.connect(self.credentials)
+            self.connection = MySQLdb.connect(**self.credentials)
         return self.connection
 
     def close(self):
@@ -21,7 +21,7 @@ class CM(object):
             self.connection.close()
             self.connection = None
 
-cm = CM(**secret.db_credentials) # default so I don't have to fix my old code :P
+cm = CM(secret.db_credentials) # default so I don't have to fix my old code :P
 
 def exec_mysql(sql, retries=2):
     try:
