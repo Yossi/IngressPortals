@@ -1,11 +1,9 @@
-import secret
 import MySQLdb
 
 class CM(object):
     ''' connection manager '''
-    def __init__(self, credentials):
+    def __init__(self):
         self.connection = None
-        self.credentials = credentials
 
     def set_credentials(self, credentials):
         self.credentials = credentials
@@ -21,7 +19,7 @@ class CM(object):
             self.connection.close()
             self.connection = None
 
-cm = CM(secret.db_credentials) # default so I don't have to fix my old code :P
+cm = CM()
 
 def exec_mysql(sql, retries=2):
     try:

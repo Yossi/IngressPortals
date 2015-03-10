@@ -2,11 +2,13 @@ import gmail # https://github.com/charlierguo/gmail
 import sys
 import secret
 import datetime
-from util import exec_mysql
+from util import exec_mysql, cm
 from itertools import chain
 import operator
 from urlparse import urlsplit, urlunsplit, parse_qs
 from urllib import urlencode
+
+cm.set_credentials(secret.db_credentials)
 
 def get_start_date():
     dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])

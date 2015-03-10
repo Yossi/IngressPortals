@@ -1,11 +1,13 @@
 import json
 import datetime
 from collections import Counter
-from util import exec_mysql
+from util import exec_mysql, cm
+import secret
 
 from flask import Flask, render_template, url_for
 app = Flask(__name__)
 
+cm.set_credentials(secret.db_credentials)
 
 def get_timespan(ping, pong=None):
     ping_date = ping
