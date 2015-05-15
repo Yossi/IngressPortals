@@ -124,12 +124,13 @@ def scrape(service):
     pongs = ('Ingress Portal Live',
              'Ingress Portal Rejected',
              'Ingress Portal Duplicate',
-             'Ingress Portal Game Rejected',)
+             'Ingress Portal Game Rejected',
+             'Portal review complete',)
 
     print 'Hello', service.users().getProfile(userId='me').execute()['emailAddress']
 
     query = ('(from:ingress-support@google.com OR from:super-ops@google.com)'
-             ' after:%(date)s subject:"Ingress Portal"' % {'date': get_start_date()})
+             ' after:%(date)s subject:"Portal"' % {'date': get_start_date()})
     # print query
 
     user_id = 'me'
@@ -152,13 +153,13 @@ def scrape(service):
                     if part['mimeType'] == 'text/html':
                         html = base64.b64decode(part['body']['data'].replace('-', '+').replace('_', '/'))
         ##########################
-        # print date, subject, html
+        #print date, subject, html
 
         if ':' in subject:
             preamble, portal_name = subject.partition(':')[::2]
             portal_name = portal_name.lower().strip()
 
-            status = ('Live' in preamble)
+            status = ('Live' in preamble or "we've accepted your submission" in html)
 
             image_url = html.partition('src="')[2].partition('" alt="')[0]
 
