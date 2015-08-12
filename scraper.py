@@ -79,9 +79,9 @@ def get_start_date():
     #return dates[-1].date()
     dates = filter(lambda x: bool(x), dates)
     if len(dates) > 1:
-        return max(dates).date()
+        return max(dates).date() - datetime.timedelta(days=1)
     else:
-        return dates[0].date()
+        return dates[0].date() - datetime.timedelta(days=1)
 
 def get_status(status_before, status_after):
     if status_after == status_before:
