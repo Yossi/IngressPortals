@@ -131,7 +131,7 @@ def scrape(service):
 
     print 'Hello', service.users().getProfile(userId='me').execute()['emailAddress']
 
-    query = ('(from:ingress-support@google.com OR from:super-ops@google.com)'
+    query = ('(from:ingress-support@google.com OR from:super-ops@google.com OR ingress-support@nianticlabs.com)'
              ' after:%(date)s subject:"Portal"' % {'date': get_start_date()})
     # print query
 
