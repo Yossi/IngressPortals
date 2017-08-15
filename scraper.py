@@ -13,13 +13,13 @@ import base64
 import datetime
 import operator
 from itertools import chain
-from urlparse import urlsplit, urlunsplit, parse_qs
+from urllib.parse import urlsplit, urlunsplit, parse_qs
 
-import httplib2
-from dateutil.parser import parse
+import httplib2 # pip install httplib2
+from dateutil.parser import parse # pip install python-dateutil
 
 # https://developers.google.com/gmail/api/quickstart/quickstart-python
-from apiclient import errors
+from apiclient import errors # pip install --upgrade google-api-python-client
 from apiclient.discovery import build
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
@@ -69,15 +69,15 @@ def ListMessagesMatchingQuery(service, user_id, query=''):
             response = service.users().messages().list(userId=user_id, q=query, pageToken=page_token).execute()
             messages.extend(response['messages'])
         return messages
-    except errors.HttpError, error:
-        print 'An error occurred: %s' % error
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
 
 def get_start_date():
     dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
     dates.append(datetime.datetime(2013, 11, 15))  # closed beta begin date
     #dates.append(datetime.datetime(2015, 5, 12))  # debuging date
     #return dates[-1].date()
-    dates = filter(lambda x: bool(x), dates)
+    dates = list(filter(lambda x: bool(x), dates))
     if len(dates) > 1:
         return max(dates).date() - datetime.timedelta(days=1)
     else:
@@ -129,7 +129,7 @@ def scrape(service):
              'Ingress Portal Game Rejected',
              'Portal review complete',)
 
-    print 'Hello', service.users().getProfile(userId='me').execute()['emailAddress']
+    print('Hello', service.users().getProfile(userId='me').execute()['emailAddress'])
 
     query = ('(from:ingress-support@google.com OR from:super-ops@google.com OR ingress-support@nianticlabs.com)'
              ' after:%(date)s subject:"Portal"' % {'date': get_start_date()})
@@ -138,8 +138,8 @@ def scrape(service):
     user_id = 'me'
     emails = ListMessagesMatchingQuery(service, user_id, query=query)[::-1]
 
-    if len(emails): print 'emails found. proccessing...'
-    else: print 'no new emails found'
+    if len(emails): print('emails found. proccessing...')
+    else: print('no new emails found')
 
     status_before = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
 
@@ -153,7 +153,7 @@ def scrape(service):
                 subject = header['value']
                 for part in message['payload']['parts']:
                     if part['mimeType'] == 'text/html':
-                        html = base64.b64decode(part['body']['data'].replace('-', '+').replace('_', '/'))
+                        html = base64.b64decode(part['body']['data'].replace('-', '+').replace('_', '/')).decode('utf8')
         ##########################
         #print date, subject, html
 
@@ -171,14 +171,14 @@ def scrape(service):
             #print preamble, portal_name, status, image_url, portal_url
 
             if preamble in pings and date not in set(chain(*exec_mysql('SELECT ping FROM portals2'))):
-                print subject
-                print 'new submitted portal'
+                print(subject)
+                print('new submitted portal')
                 exec_mysql("""INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', "%s", '%s') ON DUPLICATE KEY UPDATE image_url='%s';""" % (date, portal_name.replace('"', '\\"'), image_url, image_url))
                 #print """INSERT INTO portals2 (ping, `name`, image_url) VALUES ('%s', "%s", '%s') ON DUPLICATE KEY UPDATE image_url='%s';""" % (date, portal_name.replace('"', '\\"'), image_url, image_url)
 
             if preamble in pongs and date not in set(chain(*exec_mysql('SELECT pong FROM portals2'))):
-                print subject
-                print 'portal response received'
+                print(subject)
+                print('portal response received')
                 names = list(chain(*exec_mysql('SELECT `name` FROM portals2 WHERE status is null;')))
                 if names.count(portal_name) == 1:
                     exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = %s WHERE `name` = "%s" AND status is null LIMIT 1;""" % (date, status, portal_url, portal_name.replace('"', '\\"')))
@@ -186,17 +186,17 @@ def scrape(service):
                 else:
                     # id = exec_sql("""SELECT Id FROM portals2 WHERE image_url = '%s';""" % image_url)[0]
                     if image_url:
-                        print 'attempting image_url match'
+                        print('attempting image_url match')
                         exec_mysql("""UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = %s WHERE image_url = '%s' AND status is null LIMIT 1;""" % (date, status, portal_url, image_url))
                         #print """UPDATE portals2 SET pong = '%s', `status` = %s, portal_url = %s WHERE image_url = '%s' AND status is null LIMIT 1;""" % (date, status, portal_url, image_url)
                     else:
-                        print 'FAILED! duplicate or modified name; attention required'
+                        print('FAILED! duplicate or modified name; attention required')
                         exec_mysql("""INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, %s) ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url))
                         #print """INSERT INTO portals2 (pong, `name`, `status`, portal_url) VALUES ('%s', "%s", %s, %s) ON DUPLICATE KEY UPDATE Id=Id;""" % (date, portal_name.replace('"', '\\"'), status, portal_url)
 
     status_after = exec_mysql('SELECT SUM(status = 1), SUM(status = 0), SUM(status IS NULL) FROM portals2')[0]
-    print get_status(status_before, status_after)
-    print 'all done'
+    print(get_status(status_before, status_after))
+    print('all done')
 
 
 if __name__ == '__main__':
