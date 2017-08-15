@@ -7,7 +7,7 @@ import secret
 from flask import Flask, render_template, url_for
 app = Flask(__name__)
 
-cm.set_credentials(secret.db_credentials)
+cm.set_credentials(secret.dbconfig)
 
 def get_timespan(ping, pong=None):
     ping_date = ping

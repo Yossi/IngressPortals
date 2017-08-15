@@ -1,4 +1,10 @@
+import pymysql # pip install pymysql
+pymysql.install_as_MySQLdb()
 import MySQLdb
+import logging
+
+import warnings
+warnings.filterwarnings('error', category=MySQLdb.Warning)
 
 class CM(object):
     ''' connection manager '''
@@ -11,6 +17,7 @@ class CM(object):
 
     def get_conn(self):
         if not self.connection:
+            logging.info('no db connection. creating...')
             self.connection = MySQLdb.connect(**self.credentials)
         return self.connection
 
@@ -28,6 +35,8 @@ def exec_mysql(sql, retries=2):
         cur = db.cursor()
         cur.execute(sql)
         rows = [r for r in cur.fetchall()]
+        if not rows and not sql.strip().lower().startswith('select'):
+            rows = cur.rowcount
         cur.close()
         db.commit()
         return rows
@@ -37,6 +46,11 @@ def exec_mysql(sql, retries=2):
             cur.close()
         cm.close()
         if retries:
+            logging.warning('sql query failed, retrying')
             return exec_mysql(sql, retries-1)
         else:
             raise
+
+    except:
+        logging.error(sql)
+        raise

@@ -31,7 +31,7 @@ from util import exec_mysql, cm
 # https://developers.google.com/gmail/api/v1/reference/
 
 
-cm.set_credentials(secret.db_credentials)
+cm.set_credentials(secret.dbconfig)
 
 
 # Path to the client_secret.json file downloaded from the Developer Console
