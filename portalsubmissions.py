@@ -4,8 +4,8 @@ from collections import Counter
 from util import exec_mysql, cm
 import secret
 
-from flask import Flask, render_template, url_for
-app = Flask(__name__)
+from flask import render_template, url_for, Blueprint, Flask
+app = Blueprint('portals', __name__, url_prefix='/portals')
 
 cm.set_credentials(secret.dbconfig)
 
@@ -59,13 +59,13 @@ def get_chart_data(cmd='start'):
 
     return {'data': dataTable,
             'colors': colors,
-            'count': Counter(zip(*data)[3]),
-            'start_url': url_for('start'),
-            'end_url': url_for('end'),
-            'days_url': url_for('days'),
-            'json_url': url_for('get_json'),
-            'summary_url': url_for('get_summary_data'),
-            'histogram_url': url_for('get_histogram')}
+            'count': Counter(list(zip(*data))[3]),
+            'start_url': url_for('portals.start'),
+            'end_url': url_for('portals.end'),
+            'days_url': url_for('portals.days'),
+            'json_url': url_for('portals.get_json'),
+            'summary_url': url_for('portals.get_summary_data'),
+            'histogram_url': url_for('portals.get_histogram')}
 
 @app.route('/')
 @app.route('/start')
@@ -126,5 +126,7 @@ def get_histogram():
     return render_template('histogram.html', **{'data':[(row[0], str(row[0].time())[:2]) for row in exec_mysql('select pong from portals2 where pong is not null')]})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    a = Flask(__name__)
+    a.register_blueprint(app)
+    a.run(host='0.0.0.0', debug=True)
     
