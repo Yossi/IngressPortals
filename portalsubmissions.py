@@ -33,8 +33,7 @@ def get_chart_data(cmd='start'):
                     None:  '#FF9900'}
 
     if cmd == 'start' or cmd == None:
-        pass
-        #data.sort(key=lambda x: x[0] if x[0] else first_run)
+        data.sort(key=lambda x: x[0] if x[0] else first_run)
     if cmd == 'end':
         data.sort(key=lambda x: x[1] if x[1] else datetime.datetime.utcnow())
     if cmd == 'days':
