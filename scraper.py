@@ -74,7 +74,8 @@ def ListMessagesMatchingQuery(service, user_id, query=''):
 
 def get_start_date():
     dates = list(exec_mysql('SELECT max(ping), max(pong) FROM portals2;')[0])
-    dates.append(datetime.datetime(2013, 11, 15))  # closed beta begin date
+    #dates=[]
+    dates.append(datetime.datetime(2012, 11, 15))  # closed beta begin date
     #dates.append(datetime.datetime(2015, 5, 12))  # debuging date
     #return dates[-1].date()
     dates = list(filter(lambda x: bool(x), dates))
@@ -86,6 +87,8 @@ def get_start_date():
 def get_status(status_before, status_after):
     if status_after == status_before:
         return 'no change'
+    if not status_before: # first run
+        return 'Accepted: %s Rejected: %s Pending: %s' % status_after
     return 'Accepted: %s Rejected: %s Pending: %s' % tuple(map(operator.__sub__, status_after, status_before))
 
 def canonicalize_url(url):
