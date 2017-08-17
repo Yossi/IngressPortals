@@ -19,18 +19,21 @@ def get_timespan(ping, pong=None):
     return (pong_date - ping_date).days
 
 def get_chart_data(cmd='start'):
-    data = list(exec_mysql('SELECT ping, pong, `name`, `status`, Id FROM portals2;'))
+    data = list(exec_mysql('SELECT ping, pong, `name`, `status`, portal_url FROM portals2 WHERE NOT (portal_url IS NOT NULL AND `status` = 0);'))
+    data.extend(exec_mysql('SELECT ping, pong, `name`, -1, portal_url FROM portals2 WHERE portal_url IS NOT NULL AND `status` = 0;'))
     first_run = exec_mysql('SELECT min(ping) FROM portals2;')[0][0]
 
     dataTable = []
 
     status_name = {True:  'Accepted',
                    False: 'Rejected',
-                   None:  'Pending'}
+                   None:  'Pending',
+                   -1:    'Duplicate'}
 
     status_color = {True:  '#3366CC',
                     False: '#DC3912',
-                    None:  '#FF9900'}
+                    None:  '#FF9900',
+                    -1:    '#990099'}
 
     if cmd == 'start' or cmd == None:
         data.sort(key=lambda x: x[0] if x[0] else first_run)
@@ -48,7 +51,7 @@ def get_chart_data(cmd='start'):
         colors[i] = status_color[color]
 
     now = datetime.datetime.utcnow()
-    for ping, pong, name, status, id_ in data:
+    for ping, pong, name, status, portal_url in data:
         fillings = {'id': status_name[status],
                     'name': '{} ({} days)'.format(name.replace("'", "\\'"), get_timespan(ping, pong)),
                     'ping': ping.isoformat() if ping else first_run.isoformat(),
