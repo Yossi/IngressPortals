@@ -2,7 +2,7 @@ CREATE TABLE `portals2` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ping` datetime DEFAULT NULL,
   `pong` datetime DEFAULT NULL,
-  `name` varchar(50) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `status` tinyint(1) DEFAULT NULL,
   `image_url` varchar(160) DEFAULT NULL,
   `portal_url` varchar(90) DEFAULT NULL,
